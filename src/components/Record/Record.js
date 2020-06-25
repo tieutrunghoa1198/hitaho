@@ -13,10 +13,14 @@ export default class Record extends Component {
             isLoading: false,
             transcript: '',
             isRecord: false,
-            url: ''
+            url: '',
+            file: null
         }
         this.audio = new Audio()
         this.speechReceived = this.speechReceived.bind(this)
+
+        this.onFormSubmit = this.onFormSubmit.bind(this)
+        this.onChange = this.onChange.bind(this)
     }
     /*
         function for react-mic 
@@ -100,6 +104,20 @@ export default class Record extends Component {
             audio.load()
         }, timeout);
     }
+
+    /*
+        File uploader 
+    */
+
+    onFormSubmit(e) {
+        e.preventDefault() // Stop form submit
+        this.speechToText(this.state.file)
+    }
+
+    onChange(e) {
+        this.setState({ file: e.target.files[0] })
+    }
+
     /* 
     
     componentWillMount and componentDidMount
@@ -131,12 +149,16 @@ export default class Record extends Component {
                     </div>
                 </div>
                 <div>
-                    <h3>Audio Here</h3>
+                    <h3>Audio Result</h3>
                     <br />
                     <audio id="audio" controls="controls">
                         <source id="adudioSource" src="" type="audio/mpeg" />
-                                Your browser does not support the audio element.
+                            Your browser does not support the audio element.
                     </audio>
+                    <form onSubmit={this.onFormSubmit}>
+                        <input type="file" onChange={this.onChange} />
+                        <button type="submit">Upload</button>
+                    </form>
                 </div>
             </>
         )
