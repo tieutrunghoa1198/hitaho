@@ -41,17 +41,7 @@ function SectionButtons() {
             <h2>Voice Separation</h2>
           </div>
           <div id="buttons">
-            <div className="title">
             <Record />
-              <h3>
-                
-                Buttons
-                
-              </h3>
-            </div>
-          </div>
-          <div className="title">
-            <h3>Links</h3>
           </div>
         </Container>
       </div>

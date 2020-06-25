@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { ReactMic } from 'react-mic'
 import { ClipLoader } from "react-spinners"
-import axios from '../../Axios and config/axios'
 import axiosSTT from '../../Axios and config/axiosSTT'
 import axiosTTS from '../../Axios and config/axiosTTS'
 import StartButton from './StartButton'
@@ -14,6 +13,7 @@ export default class Record extends Component {
             isLoading: false,
             transcript: '',
             isRecord: false,
+            url: ''
         }
         this.audio = new Audio()
         this.speechReceived = this.speechReceived.bind(this)
@@ -50,41 +50,30 @@ export default class Record extends Component {
         })
     }
 
+    linkIsReady = () => {
+        this.setState({
+
+        })
+    }
+
     isLoading = (boolean) => {
         this.setState({
             isLoading: boolean
         })
     }
 
-    requestTo_VoiceBot = (transcript) => {
-        let tts
-        this.isLoading(true)
-        axios
-            .post('/api/chatbot/', {
-                question: transcript
-            })
-            .then(res => {
-                tts = res.data
-                console.log(res.data)
-                this.setText(res.data)
-                this.textToSpeech(tts)
-            })
-            .catch(err => {
-                let errMsg = 'Chà, có vẻ như câu hỏi của bạn nằm ngoài kiến thức của tui rùi, liên lạc với tiêu hòa để giải quyết nhé'
-                this.textToSpeech(errMsg)
-                console.log('Request to voice bot error: ', err)
-            })
-    }
-
-    speechToText = (blob) => {
+    speechToText = (blob) => { //binary large object 
         let responseText
         axiosSTT
             .post('', blob)
             .then(response => {
                 responseText = response.data.hypotheses[0].utterance
-                console.log(responseText)
-                this.setText(responseText)
-                this.requestTo_VoiceBot(responseText)
+                
+                let string = responseText.replace(/\.|,/g, '');
+                console.log(string)
+                this.isLoading(false)
+                this.setText(string)
+                this.textToSpeech(string)
             }).catch(err => {
                 console.log('Request to FPT error: ', err);
                 console.log(process.env)
@@ -104,6 +93,8 @@ export default class Record extends Component {
             })
     }
 
+
+
     waitLinkAvailable = (url, timeout) => {
         /*
             Lỗi:  DOMException: The play() request was interrupted by a call to pause()
@@ -112,13 +103,13 @@ export default class Record extends Component {
         console.log('start')
         setTimeout(() => {
             audio.src = url
-            audio.play().then(() => {
-                this.isLoading(false)
-                console.log('Ready status: ', audio.readyState)
-            }).catch(err => {
-                console.log('Ready status: ', audio.readyState)
-                console.log('Lỗi: ', err)
-            })
+            // audio.play().then(() => {
+            //     this.isLoading(false)
+            //     console.log('Ready status: ', audio.readyState)
+            // }).catch(err => {
+            //     console.log('Ready status: ', audio.readyState)
+            //     console.log('Lỗi: ', err)
+            // })
         }, timeout);
     }
     /* 
@@ -127,7 +118,7 @@ export default class Record extends Component {
 
     */
     render() {
-        const { isLoading, transcript, isRecord } = this.state
+        const { isLoading, transcript, isRecord, url } = this.state
         return (
             <>
                 <div className="container-fluid">
@@ -150,6 +141,15 @@ export default class Record extends Component {
                             {isLoading ? <ClipLoader /> : transcript}
                         </p>
                     </div>
+                </div>
+                <div>
+                    <h3>Audio Here</h3>
+                    <br />
+                    <audio controls>
+                        {/* <source src="horse.ogg" type="audio/ogg" /> */}
+                        <source src={url} type="audio/mpeg" />
+                                Your browser does not support the audio element.
+                    </audio>
                 </div>
             </>
         )
