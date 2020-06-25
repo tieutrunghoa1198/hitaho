@@ -68,7 +68,6 @@ export default class Record extends Component {
             .post('', blob)
             .then(response => {
                 responseText = response.data.hypotheses[0].utterance
-                
                 let string = responseText.replace(/\.|,/g, '');
                 console.log(string)
                 this.isLoading(false)
@@ -93,23 +92,12 @@ export default class Record extends Component {
             })
     }
 
-
-
     waitLinkAvailable = (url, timeout) => {
-        /*
-            Lỗi:  DOMException: The play() request was interrupted by a call to pause()
-        */
-        let { audio } = this
         console.log('start')
         setTimeout(() => {
+            var audio = document.getElementById('audio')
             audio.src = url
-            // audio.play().then(() => {
-            //     this.isLoading(false)
-            //     console.log('Ready status: ', audio.readyState)
-            // }).catch(err => {
-            //     console.log('Ready status: ', audio.readyState)
-            //     console.log('Lỗi: ', err)
-            // })
+            audio.load()
         }, timeout);
     }
     /* 
@@ -118,7 +106,7 @@ export default class Record extends Component {
 
     */
     render() {
-        const { isLoading, transcript, isRecord, url } = this.state
+        const { isLoading, transcript, isRecord } = this.state
         return (
             <>
                 <div className="container-fluid">
@@ -145,9 +133,8 @@ export default class Record extends Component {
                 <div>
                     <h3>Audio Here</h3>
                     <br />
-                    <audio controls>
-                        {/* <source src="horse.ogg" type="audio/ogg" /> */}
-                        <source src={url} type="audio/mpeg" />
+                    <audio id="audio" controls="controls">
+                        <source id="adudioSource" src="" type="audio/mpeg" />
                                 Your browser does not support the audio element.
                     </audio>
                 </div>
